@@ -1,5 +1,7 @@
 using System.Text;
 using ControleFacil.Api.Data;
+using ControleFacil.Api.Domain.Repository.Classes;
+using ControleFacil.Api.Domain.Repository.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -26,7 +28,8 @@ static void ConfigurarInjecaoDeDependencia(WebApplicationBuilder builder)
     
     builder.Services
     .AddSingleton(builder.Configuration)
-    .AddSingleton(builder.Environment);
+    .AddSingleton(builder.Environment)
+    .AddScoped<IUsuarioRepository, UsuarioRepository>();
 }
 
 // Configura o serviços da API.
