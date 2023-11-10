@@ -1,4 +1,6 @@
 using System.Text;
+using AutoMapper;
+using ControleFacil.Api.AutoMapper;
 using ControleFacil.Api.Data;
 using ControleFacil.Api.Domain.Repository.Classes;
 using ControleFacil.Api.Domain.Repository.Interfaces;
@@ -25,10 +27,18 @@ static void ConfigurarInjecaoDeDependencia(WebApplicationBuilder builder)
     string? connectionString = builder.Configuration.GetConnectionString("PADRAO");
     builder.Services.AddDbContext<ApplicationContext>(options =>
     options.UseNpgsql(connectionString), ServiceLifetime.Transient, ServiceLifetime.Transient);
-    
+
+    var config = new MapperConfiguration(cfg =>
+    {
+        cfg.AddProfile<UsuarioProfile>();
+    });
+
+    IMapper mapper = config.CreateMapper();
+
     builder.Services
     .AddSingleton(builder.Configuration)
     .AddSingleton(builder.Environment)
+    .AddSingleton(mapper)
     .AddScoped<IUsuarioRepository, UsuarioRepository>();
 }
 
@@ -68,7 +78,7 @@ static void ConfigurarServices(WebApplicationBuilder builder)
             }
         });
 
-        c.SwaggerDoc("v1", new OpenApiInfo { Title = "ControleFacil.Api", Version = "v1" });   
+        c.SwaggerDoc("v1", new OpenApiInfo { Title = "ControleFacil.Api", Version = "v1" });
     });
 
     builder.Services.AddAuthentication(x =>
@@ -102,8 +112,8 @@ static void ConfigurarAplicacao(WebApplication app)
     app.UseSwagger()
         .UseSwaggerUI(c =>
         {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ControleFacil.Api v1");
-                c.RoutePrefix = string.Empty;
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "ControleFacil.Api v1");
+            c.RoutePrefix = string.Empty;
         });
 
     app.UseCors(x => x
